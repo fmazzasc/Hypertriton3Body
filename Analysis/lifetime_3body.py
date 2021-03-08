@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
 import ROOT
-ROOT.gROOT.LoadMacro("fit_macros/comb_fit_gaus.C")
+ROOT.gROOT.LoadMacro("helpers/fit_macros/comb_fit_gaus.C")
 from ROOT import comb_fit_gaus
-ROOT.gROOT.LoadMacro("fit_macros/comb_fit_erf.C")
+ROOT.gROOT.LoadMacro("helpers/fit_macros/comb_fit_erf.C")
 from ROOT import comb_fit_erf
 ROOT.gROOT.SetBatch()
 
@@ -36,7 +36,7 @@ with open(os.path.expandvars(args.config), 'r') as stream:
 # define some globals
 FILE_PREFIX = params['FILE_PREFIX']
 
-DATA_PATH = os.path.expandvars(params['DATA_PATH'])
+DATA_PATH = os.path.expandvars(params["APPLICATION_PATHS"]['DATA_PATH'])
 
 SPLIT_LIST = ['_matter','_antimatter'] if args.split else ['']
 BKG_MODELS = params['BKG_MODELS'] if 'BKG_MODELS' in params else ['expo']
@@ -58,20 +58,20 @@ SYSTEMATICS_COUNTS = 100000
 
 ###############################################################################
 # input/output files
-results_dir = os.environ['HYPERML_RESULTS_{}'.format(params['NBODY'])]
-tables_dir = os.path.dirname(DATA_PATH)
-efficiency_dir = os.environ['HYPERML_EFFICIENCIES_{}'.format(params['NBODY'])]
-utils_dir = os.environ['HYPERML_UTILS_{}'.format(params['NBODY'])]
+results_dir = "../Results"
+tables_dir = "../Tables"
+efficiency_dir = "../Results/Efficiencies"
+utils_dir = "../Utils"
 mcsigma_dir = utils_dir + '/FixedSigma'
 
 # input data file
-file_name = tables_dir + f'/applied_df_ct_analysis_o2_old_ls.parquet.gzip'
+file_name = tables_dir + f'/pass1/applied_df_ct_analysis_data.parquet.gzip'
 data_df = pd.read_parquet(file_name)
-file_name = tables_dir + f'/applied_df_ct_analysis_o2_old_ls_ls.parquet.gzip'
+file_name = tables_dir + f'/pass1/applied_df_ct_analysis_ls.parquet.gzip'
 ls_df = pd.read_parquet(file_name)
 
 # output file
-file_name = results_dir + f'/{FILE_PREFIX}_dist_new.root'
+file_name = results_dir + f'/{FILE_PREFIX}_dist.root'
 output_file = ROOT.TFile(file_name, 'recreate')
 
 # preselection eff
@@ -255,7 +255,9 @@ for split in SPLIT_LIST:
 
 
             # define signal parameters
-            raw_counts = CombinedFit(selected_ls_hist, selected_data_hist, f"comb_fit_{eff}", mass_range[0], mass_range[1], mcsigma)
+            raw_counts = comb_fit_gaus(selected_ls_hist, selected_data_hist, f"comb_fit_{eff}_gaus", mass_range[0], mass_range[1], mcsigma)
+            # raw_counts_2 = comb_fit_erf(selected_ls_hist, selected_data_hist, f"comb_fit_{eff}_erf", mass_range[0], mass_range[1], mcsigma)
+
 
 
             raw_counts_err = np.sqrt(raw_counts)
