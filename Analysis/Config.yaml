@@ -12,12 +12,12 @@ BKG_MODELS: ["expo", "pol1", "pol2"]
 BDT_EFFICIENCY: [0.10, 1., 0.01] # min, max ,step
 
 TRAINING_PATHS:
-  MC_PATH: ../Tables/SignalTableReweight.root
-  BKG_PATH: ../Tables/LikeSignTable_18r.root
+  MC_PATH: ../Tables/pass1/SignalTableReweight.root
+  BKG_PATH: ../Tables/pass1/LikeSignTable_18r.root
 
 APPLICATION_PATHS:
-  DATA_PATH: ../Tables/DataTable_*
-  LS_PATH: ../Tables/LikeSignTable_*
+  DATA_PATH: ../Tables/pass1/DataTable_*
+  LS_PATH: ../Tables/pass1/LikeSignTable_*
   LS_PION_PATH: 
   EM_PATH: 
 

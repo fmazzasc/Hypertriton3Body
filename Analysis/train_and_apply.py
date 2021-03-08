@@ -140,7 +140,7 @@ if APPLICATION:
 
     for split in SPLIT_LIST:
         print('\n++++++++++++++++++++++++++++++++++++++++++++++++++')
-        print ('\nStarting BDT appplication on MC data')
+        print ('\nStarting BDT appplication on MC data\n')
         tree_name = signal_path + ":/SignalTable"
         df_applied_mc = hau.apply_on_large_data(tree_name, CENT_CLASSES, PT_BINS, CT_BINS, COLUMNS, split)
         df_applied_mc.to_parquet(os.path.dirname(signal_path) + f'/applied_mc_df_{FILE_PREFIX}.parquet.gzip', compression='gzip')
@@ -153,28 +153,28 @@ if APPLICATION:
 
             if ls_path is not None:
                 print('\n++++++++++++++++++++++++++++++++++++++++++++++++++')
-                print ('\nStarting BDT appplication on LS')
+                print ('\nStarting BDT appplication on LS\n')
                 tree_name = ls_path + ":/DataTable"
                 df_applied = hau.apply_on_large_data(tree_name, CENT_CLASSES, PT_BINS, CT_BINS, COLUMNS, split)
                 df_applied.to_parquet(os.path.dirname(ls_path) + f'/applied_df_{FILE_PREFIX}_ls.parquet.gzip', compression='gzip')
 
             if ls_pion_path is not None:
                 print('\n++++++++++++++++++++++++++++++++++++++++++++++++++')
-                print ('\nStarting BDT appplication on LS with swapped Pion')
+                print ('\nStarting BDT appplication on LS with swapped Pion\n')
                 tree_name = ls_pion_path + ":/DataTable"
                 df_applied = hau.apply_on_large_data(tree_name, CENT_CLASSES, PT_BINS, CT_BINS, COLUMNS, split)
                 df_applied.to_parquet(os.path.dirname(ls_pion_path) + f'/applied_df_{FILE_PREFIX}_ls_pion.parquet.gzip', compression='gzip')
 
             if em_path is not None:
                 print('\n++++++++++++++++++++++++++++++++++++++++++++++++++')
-                print ('\nStarting BDT appplication on Event Mixing')
+                print ('\nStarting BDT appplication on Event Mixing\n')
                 tree_name = em_path + ":/DataTable"
                 df_applied = hau.apply_on_large_data(tree_name, CENT_CLASSES, PT_BINS, CT_BINS, COLUMNS, split)
                 df_applied.to_parquet(os.path.dirname(em_path) + f'/applied_df_{FILE_PREFIX}_em.parquet.gzip', compression='gzip')
 
             if data_path is not None:
                 print('\n++++++++++++++++++++++++++++++++++++++++++++++++++')
-                print ('\nStarting BDT appplication on Data')
+                print ('\nStarting BDT appplication on Data\n')
                 tree_name = data_path + ":/DataTable"
                 df_applied = hau.apply_on_large_data(tree_name, CENT_CLASSES, PT_BINS, CT_BINS, COLUMNS, split)
                 df_applied.to_parquet(os.path.dirname(data_path) + f'/applied_df_{FILE_PREFIX}_data.parquet.gzip', compression='gzip')

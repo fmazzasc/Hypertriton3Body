@@ -55,6 +55,7 @@ def apply_on_large_data(tree_path, cent_classes, pt_bins, ct_bins, training_colu
                     df_list.append(df_tmp)
 
     df_applied = pd.concat(df_list)
+    print("\n******** Dataframe head ********")
     print(df_applied.head(10))
     return df_applied
     
