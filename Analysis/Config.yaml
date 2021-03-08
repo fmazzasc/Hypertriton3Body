@@ -1,7 +1,5 @@
 FILE_PREFIX: "ct_analysis"
 
-LOAD_APPLIED_DATA: False
-
 CENTRALITY_CLASS:
   - [0, 90]
 CT_BINS: [2, 4, 6, 10, 14, 35]
@@ -14,6 +12,7 @@ TRAINING_PATHS:
   MC_PATH: ../Tables/pass1/SignalTableReweight.root
   BKG_PATH: ../Tables/pass1/LikeSignTable_18r.root
 
+LOAD_APPLIED_DATA: True
 APPLICATION_PATHS:
   DATA_PATH: ../Tables/pass1/DataTable_*
   LS_PATH: ../Tables/pass1/LikeSignTable_*
@@ -21,7 +20,7 @@ APPLICATION_PATHS:
   EM_PATH: 
 
 
-ANALYSIS_RESULTS_PATH: ../Tables/AnalysisResultsQR.root
+ANALYSIS_RESULTS_PATH: ../Tables/pass1/AnalysisResultsQR.root
 
 XGBOOST_PARAMS:
   # general parameters

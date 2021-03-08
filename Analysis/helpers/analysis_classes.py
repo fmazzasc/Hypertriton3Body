@@ -1,18 +1,16 @@
 
 import os
 import sys
+import ROOT
 from concurrent.futures import ThreadPoolExecutor
-
 import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
-import ROOT
 import uproot
 import xgboost as xgb
 from hipe4ml import analysis_utils, plot_utils
 from hipe4ml.model_handler import ModelHandler
 from sklearn.model_selection import train_test_split
-
 import hyp_analysis_utils as hau
 import hyp_plot_utils as hpu
 
@@ -296,7 +294,7 @@ class ModelApplication:
 
             exp_signal_ctint = hau.expected_signal_counts(
                 bw, cent_class, pt_range, pre_selection_efficiency * bdt_efficiency[index],
-                self.hist_centrality, self.mode)
+                self.hist_centrality, 3)
 
             if split is not '':
                 exp_signal_ctint = 0.5 * exp_signal_ctint
@@ -331,7 +329,7 @@ class ModelApplication:
         data_range_array = [ct_range[0], ct_range[1], pt_range[0], pt_range[1], cent_class[0], cent_class[1]]
         hpu.plot_significance_scan(
             max_index, significance_custom, significance_custom_error, expected_signal, df_bkg, threshold_space,
-            data_range_array, nevents, self.mode, split, mass_bins, hist_range)
+            data_range_array, nevents, 3, split, mass_bins, hist_range)
 
         bdt_eff_max_score = bdt_efficiency[max_index]
 

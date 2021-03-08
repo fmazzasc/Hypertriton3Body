@@ -1,6 +1,6 @@
 import sys
 sys.path.append('helpers/')
-
+import ROOT
 import argparse
 import os
 import time
@@ -8,7 +8,7 @@ import warnings
 import hyp_analysis_utils as hau
 import numpy as np
 import pandas as pd
-import ROOT
+
 import xgboost as xgb
 import yaml
 from analysis_classes import ModelApplication, TrainingAnalysis
@@ -17,7 +17,7 @@ from hipe4ml.model_handler import ModelHandler
 
 # avoid pandas warning
 warnings.simplefilter(action='ignore', category=FutureWarning)
-ROOT.gROOT.SetBatch()
+# ROOT.gROOT.SetBatch()
 
 ###############################################################################
 parser = argparse.ArgumentParser()
@@ -143,10 +143,11 @@ if APPLICATION:
         print ('\nStarting BDT appplication on MC data\n')
         tree_name = signal_path + ":/SignalTable"
         df_applied_mc = hau.apply_on_large_data(tree_name, CENT_CLASSES, PT_BINS, CT_BINS, COLUMNS, split)
+        df_applied_mc.query("gReconstructed and bw_accept", inplace=True)
         df_applied_mc.to_parquet(os.path.dirname(signal_path) + f'/applied_mc_df_{FILE_PREFIX}.parquet.gzip', compression='gzip')
 
         if LOAD_APPLIED_DATA:
-            path = os.path.dirname(data_path) + f'/applied_df_{FILE_PREFIX}.parquet.gzip'
+            path = os.path.dirname(data_path) + f'/applied_df_{FILE_PREFIX}_data.parquet.gzip'
             df_applied = pd.read_parquet(path)
 
         else:

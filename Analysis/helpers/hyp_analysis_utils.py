@@ -1,17 +1,13 @@
-import math
 import os
+import ROOT
 from concurrent.futures import ThreadPoolExecutor
 from math import floor, log10
-
 import aghast
 import numpy as np
 import pandas as pd
 import uproot
 import xgboost as xgb
 from hipe4ml.model_handler import ModelHandler
-
-import ROOT
-from ROOT import TF1, TH1D, TH2D, TH3D, TCanvas, TPaveStats, TPaveText, gStyle
 
 
 def apply_on_large_data(tree_path, cent_classes, pt_bins, ct_bins, training_columns, split=''):
@@ -55,7 +51,7 @@ def apply_on_large_data(tree_path, cent_classes, pt_bins, ct_bins, training_colu
                     df_list.append(df_tmp)
 
     df_applied = pd.concat(df_list)
-    print("\n******** Dataframe head ********")
+    print("\n******** Dataframe head ********\n")
     print(df_applied.head(10))
     return df_applied
     
@@ -104,7 +100,7 @@ def expo(x, tau):
 
 
 def h2_preselection_efficiency(ptbins, ctbins, name='PreselEff'):
-    th2 = TH2D(name, ';#it{p}_{T} (GeV/#it{c});c#it{t} (cm);Preselection efficiency',
+    th2 = ROOT.TH2D(name, ';#it{p}_{T} (GeV/#it{c});c#it{t} (cm);Preselection efficiency',
                len(ptbins) - 1, np.array(ptbins, 'double'), len(ctbins) - 1, np.array(ctbins, 'double'))
     th2.SetDirectory(0)
 
@@ -112,7 +108,7 @@ def h2_preselection_efficiency(ptbins, ctbins, name='PreselEff'):
 
 
 def h2_generated(ptbins, ctbins, name='Generated'):
-    th2 = TH2D(name, ';#it{p}_{T} (GeV/#it{c});c#it{t} (cm); Generated', len(ptbins)-1,
+    th2 = ROOT.TH2D(name, ';#it{p}_{T} (GeV/#it{c});c#it{t} (cm); Generated', len(ptbins)-1,
                np.array(ptbins, 'double'), len(ctbins) - 1, np.array(ctbins, 'double'))
     th2.SetDirectory(0)
 
@@ -120,7 +116,7 @@ def h2_generated(ptbins, ctbins, name='Generated'):
 
 
 def h2_rawcounts(ptbins, ctbins, name='RawCounts', suffix=''):
-    th2 = TH2D(f'{name}{suffix}', ';#it{p}_{T} (GeV/#it{c});c#it{t} (cm);Raw counts', len(ptbins)-1,
+    th2 = ROOT.TH2D(f'{name}{suffix}', ';#it{p}_{T} (GeV/#it{c});c#it{t} (cm);Raw counts', len(ptbins)-1,
                np.array(ptbins, 'double'), len(ctbins) - 1, np.array(ctbins, 'double'))
     th2.SetDirectory(0)
 
@@ -128,7 +124,7 @@ def h2_rawcounts(ptbins, ctbins, name='RawCounts', suffix=''):
 
 
 def h2_significance(ptbins, ctbins, name='Significance', suffix=''):
-    th2 = TH2D(f'{name}{suffix}', ';#it{p}_{T} (GeV/#it{c});c#it{t} (cm);Significance', len(ptbins)-1,
+    th2 = ROOT.TH2D(f'{name}{suffix}', ';#it{p}_{T} (GeV/#it{c});c#it{t} (cm);Significance', len(ptbins)-1,
                np.array(ptbins, 'double'), len(ctbins) - 1, np.array(ctbins, 'double'))
     th2.SetDirectory(0)
 
