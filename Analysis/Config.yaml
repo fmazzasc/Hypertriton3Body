@@ -1,4 +1,3 @@
-NBODY: 3
 FILE_PREFIX: "ct_analysis"
 
 LOAD_APPLIED_DATA: False
