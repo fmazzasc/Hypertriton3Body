@@ -1,19 +1,18 @@
 #!/usr/bin/env python3
 import ROOT
-ROOT.gROOT.LoadMacro("TrainingAndTesting/CombinedFit.C")
-from ROOT import CombinedFit
+ROOT.gROOT.LoadMacro("fit_macros/comb_fit_gaus.C")
+from ROOT import comb_fit_gaus
+ROOT.gROOT.LoadMacro("fit_macros/comb_fit_erf.C")
+from ROOT import comb_fit_erf
 ROOT.gROOT.SetBatch()
-
 
 import argparse
 import math
 import os
-
 import numpy as np
 import pandas as pd
 import yaml
 from scipy import stats
-
 import uproot
 
 
@@ -175,7 +174,6 @@ def get_effscore_dict(ctbin):
     file_name = efficiency_dir + f'/Eff_Score_{info_string}.npy'
     return {round(e[0], 2): e[1] for e in np.load(file_name).T}
 
-
 def get_mcsigma_dict(ctbin):
     info_string = f'090_210_{ctbin[0]}{ctbin[1]}'
     file_name = mcsigma_dir + f'/sigma_array_{info_string}.npy'
@@ -192,12 +190,6 @@ def normalize_ls(data_counts, ls_counts, bins):
     side_ls_counts = np.sum(ls_counts[side_region])
     scaling_factor = side_data_counts/side_ls_counts
     return scaling_factor
-
-def normalize_ls2():
-    data_entries = uproot.open(tables_dir + "/HypDataTable_data.root:/DataTable").num_entries
-    ls_entries = uproot.open(tables_dir + "/HypDataTable_ls.root:/DataTable").num_entries
-    return data_entries/ls_entries
-
 
 def h1_invmass(counts, mass_range=[2.96, 3.04] , bins=34, name=''):
     th1 = ROOT.TH1D(f'{name}', f'{name}_x', int(bins), mass_range[0], mass_range[1])
@@ -217,15 +209,9 @@ else:
     eff_best_array = [round(sigscan_dict[f'ct{ctbin[0]}{ctbin[1]}pt210'][0], 2) for ctbin in zip(CT_BINS[:-1], CT_BINS[1:])]
     # eff_best_array = np.array([0.7, 0.7, 0.7, 0.7, 0.7, 0.7])
 
-# efficiency ranges for sampling the systematics
 syst_eff_ranges = [list(range(int(x * 100) - 10, int(x * 100) + 11)) for x in eff_best_array]
-# syst_eff_ranges[-1] = syst_eff_ranges[-1][5:-5]
-
 eff_best_it = iter(eff_best_array)
-# scaling_factor = normalize_ls2()
-# print("SCALING FACTOR: ", scaling_factor)
 
-# actual analysis
 for split in SPLIT_LIST:
     for ctbin in zip(CT_BINS[:-1], CT_BINS[1:]):
         score_dict = get_effscore_dict(ctbin)
@@ -323,10 +309,6 @@ CORRECTED_COUNTS_BEST[model].SetLineColor(kBlueC)
 CORRECTED_COUNTS_BEST[model].SetMinimum(0.001)
 CORRECTED_COUNTS_BEST[model].SetMaximum(1000)
 CORRECTED_COUNTS_BEST[model].SetStats(0)
-# frame.GetYaxis().SetTitleSize(26)
-# frame.GetYaxis().SetLabelSize(22)
-# frame.GetXaxis().SetTitleSize(26)
-# frame.GetXaxis().SetLabelSize(22)
 frame.GetYaxis().SetRangeUser(7, 5000)
 frame.GetXaxis().SetRangeUser(0.5, 35.5)
 pinfo.Draw('x0same')

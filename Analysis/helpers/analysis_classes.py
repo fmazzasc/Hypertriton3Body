@@ -66,7 +66,7 @@ class TrainingAnalysis:
 
         pres_histo.Divide(gen_histo)
 
-        path = "../../Results/Efficiencies"
+        path = "../Results/Efficiencies"
         if not os.path.exists(path):
             os.makedirs(path)
 
@@ -98,7 +98,7 @@ class TrainingAnalysis:
     def MC_sigma_array(self, data, eff_score_array, cent_class, pt_range, ct_range, split=''):
         info_string = f'_{cent_class[0]}{cent_class[1]}_{pt_range[0]}{pt_range[1]}_{ct_range[0]}{ct_range[1]}{split}'
 
-        sigma_path = "../../Utils" + '/FixedSigma'
+        sigma_path = "../Utils" + '/FixedSigma'
 
         if not os.path.exists(sigma_path):
             os.makedirs(sigma_path)
@@ -145,8 +145,8 @@ class TrainingAnalysis:
     def save_ML_analysis(self, model_handler, eff_score_array, cent_class, pt_range, ct_range, split=''):
         info_string = f'_{cent_class[0]}{cent_class[1]}_{pt_range[0]}{pt_range[1]}_{ct_range[0]}{ct_range[1]}{split}'
 
-        handlers_path = "../../Models/handlers"
-        efficiencies_path = "../../Results/Efficiencies"
+        handlers_path = "../Models/handlers"
+        efficiencies_path = "../Results/Efficiencies"
 
 
         if not os.path.exists(handlers_path):
@@ -161,7 +161,7 @@ class TrainingAnalysis:
         print('ML analysis results saved.\n')
 
     def save_ML_plots(self, model_handler, data, eff_score_array, cent_class, pt_range, ct_range, split=''):
-        fig_path = "../../Figures"
+        fig_path = "../Figures"
         info_string = f'_{cent_class[0]}{cent_class[1]}_{pt_range[0]}{pt_range[1]}_{ct_range[0]}{ct_range[1]}{split}'
 
         bdt_score_dir = fig_path + '/TrainTest'
@@ -192,7 +192,7 @@ class TrainingAnalysis:
 
 class ModelApplication:
 
-    def __init__(self, mode, data_filename, analysis_res_filename, cent_classes, split):
+    def __init__(self, data_filename, analysis_res_filename, cent_classes, split):
 
         print('\n++++++++++++++++++++++++++++++++++++++++++++++++++')
         print('\nStarting BDT appplication and signal extraction')
@@ -218,7 +218,7 @@ class ModelApplication:
         print('\n++++++++++++++++++++++++++++++++++++++++++++++++++')
 
     def load_preselection_efficiency(self, cent_class, split):
-        efficiencies_path = "../../Results/Efficiencies"
+        efficiencies_path = "../Results/Efficiencies"
         filename_efficiencies = efficiencies_path + f'/preseleff_cent{cent_class[0]}{cent_class[1]}{split}.root'
 
         tfile = ROOT.TFile(filename_efficiencies)
@@ -232,8 +232,8 @@ class ModelApplication:
 
         info_string = f'_{cent_class[0]}{cent_class[1]}_{pt_range[0]}{pt_range[1]}_{ct_range[0]}{ct_range[1]}{split}'
 
-        handlers_path = "../../Models/handlers"
-        efficiencies_path = "../../Results/Efficiencies"
+        handlers_path = "../Models/handlers"
+        efficiencies_path = "../Results/Efficiencies"
 
         filename_handler = handlers_path + '/model_handler' + info_string + '.pkl'
         filename_efficiencies = efficiencies_path + '/Eff_Score' + info_string + '.npy'
@@ -251,15 +251,15 @@ class ModelApplication:
     def load_sigma_array(self, cent_class, pt_range, ct_range, split=''):
         info_string = '_{}{}_{}{}_{}{}{}'.format(cent_class[0], cent_class[1], pt_range[0],
                                                  pt_range[1], ct_range[0], ct_range[1], split)
-        sigma_path = '../../Utils/FixedSigma'
+        sigma_path = '../Utils/FixedSigma'
         filename_sigma = sigma_path + "/sigma_array" + info_string + '.npy'
         return np.load(filename_sigma)
 
 
-    def get_data_slice(self, cent_class, pt_range, ct_range, application_columns):
+    def get_data_slice(self, cent_class, pt_range, ct_range):
         data_range = f'{ct_range[0]}<ct<{ct_range[1]} and {pt_range[0]}<pt<{pt_range[1]} and {cent_class[0]}<=centrality<{cent_class[1]}'
 
-        return self.df_data.query(data_range)[application_columns]
+        return self.df_data.query(data_range)
 
     def significance_scan(self, df_bkg, pre_selection_efficiency, eff_score_array, cent_class, pt_range, ct_range, split='', mass_bins=40):
         print('\nSignificance scan: ...')
@@ -276,7 +276,7 @@ class ModelApplication:
         significance_custom = []
         significance_custom_error = []
 
-        bw_file = ROOT.TFile(os.environ['HYPERML_UTILS'] + '/BlastWaveFits.root', 'read')
+        bw_file = bw_file = ROOT.TFile('../Utils' + '/BlastWaveFits.root', 'read')
         bw = [bw_file.Get('BlastWave/BlastWave{}'.format(i)) for i in [0, 1, 2]]
         bw_file.Close()
 
@@ -343,7 +343,7 @@ class ModelApplication:
 
 def load_mcsigma(cent_class, pt_range, ct_range, mode, split=''):
     info_string = f'_{cent_class[0]}{cent_class[1]}_{pt_range[0]}{pt_range[1]}_{ct_range[0]}{ct_range[1]}{split}'
-    sigma_path = '../../Utils/FixedSigma'
+    sigma_path = '../Utils/FixedSigma'
 
     file_name = f'{sigma_path}/sigma_array{info_string}.npy'
 

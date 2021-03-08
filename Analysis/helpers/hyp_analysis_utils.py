@@ -16,8 +16,8 @@ from ROOT import TF1, TH1D, TH2D, TH3D, TCanvas, TPaveStats, TPaveText, gStyle
 
 def apply_on_large_data(tree_path, cent_classes, pt_bins, ct_bins, training_columns, split=''):
 
-    handlers_path = '../../Models/handlers'
-    efficiencies_path = '../../Results/Efficiencies'
+    handlers_path = '../Models/handlers'
+    efficiencies_path = '../Results/Efficiencies'
 
 
     executor = ThreadPoolExecutor(max_workers=64)
@@ -55,7 +55,7 @@ def apply_on_large_data(tree_path, cent_classes, pt_bins, ct_bins, training_colu
                     df_list.append(df_tmp)
 
     df_applied = pd.concat(df_list)
-    print(df_applied.info(memory_usage='deep'))
+    print(df_applied.head(10))
     return df_applied
     
 
