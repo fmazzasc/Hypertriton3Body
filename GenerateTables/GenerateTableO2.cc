@@ -27,17 +27,17 @@ void GenerateTableO2(std::string dataDir = "~/data/3body_hypertriton_data/O2/las
 {
   TChain inputChain("Hyp3O2");
   inputChain.Add(dataDir.data());
-
+  
   TFile outFile(tableDir.data(), "RECREATE");
   TableO2 tree(mc);
-
+  
   TTreeReader fReader(&inputChain);
-
+  
   if (mc) {
     TTreeReaderValue<SHyperTriton3O2> SHyper{fReader, "SHyperTriton"};
-
+  
     // get the blast wave functions for the pt reshaping
-    std::string hypUtilsDir = getenv("HYPERML_UTILS");
+    std::string hypUtilsDir = "../Utils";
     std::string bwFileArg = hypUtilsDir + "/BlastWaveFits.root";
 
     // get the bw functions for the pt rejection

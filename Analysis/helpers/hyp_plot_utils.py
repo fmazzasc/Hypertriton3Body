@@ -8,7 +8,7 @@ import pandas as pd
 import ROOT
 from scipy.stats import norm
 from sklearn.metrics import confusion_matrix
-
+import hist
 import hyp_analysis_utils as hau
 
 matplotlib.use('pdf')
@@ -322,3 +322,29 @@ def sigma_plot_makeup(histo, model, ptbin, split):
     pinfo.Draw('x0same')
     histo.Draw('ex0same')
     canvas.Write()
+
+
+def dalitz_plot(x_data, y_data, eff, ct_bin, x_axis, y_axis, x_label='', y_label=''):
+    
+    plot = (
+        hist.Hist.new
+        .Reg(x_axis[0],x_axis[1],x_axis[2], name='x', label=x_label)
+        .Reg(y_axis[0],y_axis[1],y_axis[2], name='y', label=y_label)
+        .Double()
+        )
+
+    plot.fill(x=x_data,y=y_data)
+
+    ax = plot.plot2d_full(
+        main_cmap="cividis",
+        top_color="steelblue",
+        top_lw=2,
+        side_lw=2,
+        side_color="steelblue"
+        )
+    path = f'../Figures/Dalitz/ct_{ct_bin[0]}_{ct_bin[1]}'
+    if not os.path.exists(path):
+        os.makedirs(path)
+    
+    plt.savefig(path + f'/dal_plot_eff_{eff}.png', dpi=300, facecolor='white')
+    plt.close()

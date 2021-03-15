@@ -6,6 +6,8 @@ ROOT.gROOT.LoadMacro("helpers/fit_macros/comb_fit_erf.C")
 from ROOT import comb_fit_erf
 ROOT.gROOT.SetBatch()
 
+import sys
+sys.path.append('helpers/')
 import argparse
 import math
 import os
@@ -14,6 +16,7 @@ import pandas as pd
 import yaml
 from scipy import stats
 import uproot
+import hyp_plot_utils as hpu
 
 
 np.random.seed(42)
@@ -182,14 +185,6 @@ def get_mcsigma_dict(ctbin):
     
     return {round(float(s), 2): tmp_dict[s] for s in tmp_dict}
 
-def normalize_ls(data_counts, ls_counts, bins):
-    bin_centers = 0.5 * (bins[1:] + bins[:-1])
-    side_region = np.logical_or(bin_centers<2.991-2*0.0025, bin_centers>2.991+2*0.0025)
-    
-    side_data_counts = np.sum(data_counts[side_region])
-    side_ls_counts = np.sum(ls_counts[side_region])
-    scaling_factor = side_data_counts/side_ls_counts
-    return scaling_factor
 
 def h1_invmass(counts, mass_range=[2.96, 3.04] , bins=34, name=''):
     th1 = ROOT.TH1D(f'{name}', f'{name}_x', int(bins), mass_range[0], mass_range[1])
@@ -235,10 +230,17 @@ for split in SPLIT_LIST:
             tsd = score_dict[eff]
             n_bins = 38
             mass_range = [2.97, 3.03]
-            selected_data_counts, bins = np.histogram(data_slice_ct.query('score>@tsd')['m'], bins=n_bins, range=mass_range)
-            selected_ls_counts,_ = np.histogram(ls_slice_ct.query('score>@tsd')['m'], bins=n_bins, range=mass_range)
-            # selected_ls_counts = selected_ls_counts*normalize_ls(selected_data_counts, selected_ls_counts, bins)
-            #selected_ls_counts = selected_ls_counts*scaling_factor
+    
+            data_selected = data_slice_ct.query('score>@tsd')
+            ls_selected = ls_slice_ct.query('score>@tsd')
+
+            data_selected_dalitz = data_selected.query("2.991 - 0.002 < m < 2.991 + 0.002 ")
+            hpu.dalitz_plot(data_selected_dalitz["mppi"], data_selected_dalitz["mdpi"], eff=eff, ct_bin=ctbin,
+                            x_axis=[55,1.16,1.2599], y_axis=[55,4.07,4.2199], x_label='m($p \pi$) [GeV$^2$/c$^4$]',
+                            y_label='m($d \pi$) [GeV$^2$/c$^4$]')
+
+            selected_data_counts, bins = np.histogram(data_selected['m'], bins=n_bins, range=mass_range)
+            selected_ls_counts,_ = np.histogram(ls_selected['m'], bins=n_bins, range=mass_range)
 
             selected_data_hist = h1_invmass(selected_data_counts, mass_range=mass_range, bins=n_bins, name=f'eff_{eff}_data')
             selected_ls_hist = h1_invmass(selected_ls_counts, mass_range=mass_range, bins=n_bins, name=f'eff_{eff}_ls')
