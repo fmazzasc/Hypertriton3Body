@@ -43,7 +43,7 @@ class TrainingAnalysis:
         self.df_signal['y'] = 1
         self.df_bkg['y'] = 0
 
-    def preselection_efficiency(self, cent_class, ct_bins, pt_bins, split=''):
+    def preselection_efficiency(self, cent_class, ct_bins, pt_bins, split='', training_dir = ""):
         cent_cut = f'{cent_class[0]}<=centrality<={cent_class[1]}'
 
         if (len(ct_bins)>2):
@@ -64,7 +64,7 @@ class TrainingAnalysis:
 
         pres_histo.Divide(gen_histo)
 
-        path = "../Results/Efficiencies"
+        path = "../Results/Efficiencies/" + training_dir
         if not os.path.exists(path):
             os.makedirs(path)
 
@@ -140,15 +140,17 @@ class TrainingAnalysis:
         np.save(filename_sigma, np.array(sigma_dict))
         np.save(filename_sigma_error, np.array(sigma_error_dict))
 
-    def save_ML_analysis(self, model_handler, eff_score_array, cent_class, pt_range, ct_range, split=''):
+    def save_ML_analysis(self, model_handler, eff_score_array, cent_class, pt_range, ct_range, split="", training_dir=""):
         info_string = f'_{cent_class[0]}{cent_class[1]}_{pt_range[0]}{pt_range[1]}_{ct_range[0]}{ct_range[1]}{split}'
 
-        handlers_path = "../Models/handlers"
-        efficiencies_path = "../Results/Efficiencies"
+        handlers_path = "../Models/handlers/" + training_dir
+        efficiencies_path = "../Results/Efficiencies/" + training_dir
 
 
         if not os.path.exists(handlers_path):
             os.makedirs(handlers_path)
+        if not os.path.exists(efficiencies_path):
+            os.makedirs(efficiencies_path)
 
         filename_handler = handlers_path + '/model_handler' + info_string + '.pkl'
         filename_efficiencies = efficiencies_path + '/Eff_Score' + info_string + '.npy'
@@ -158,13 +160,13 @@ class TrainingAnalysis:
 
         print('ML analysis results saved.\n')
 
-    def save_ML_plots(self, model_handler, data, eff_score_array, cent_class, pt_range, ct_range, split=''):
-        fig_path = "../Figures"
+    def save_ML_plots(self, model_handler, data, eff_score_array, cent_class, pt_range, ct_range, split='', training_dir=""):
+        fig_path = "../Figures/"
         info_string = f'_{cent_class[0]}{cent_class[1]}_{pt_range[0]}{pt_range[1]}_{ct_range[0]}{ct_range[1]}{split}'
 
-        bdt_score_dir = fig_path + '/TrainTest'
-        bdt_eff_dir = fig_path + '/Efficiency'
-        feat_imp_dir = fig_path + '/FeatureImp'
+        bdt_score_dir = fig_path + training_dir + '/TrainTest'
+        bdt_eff_dir = fig_path + training_dir +'/Efficiency'
+        feat_imp_dir = fig_path + training_dir + '/FeatureImp'
 
         bdt_score_plot = plot_utils.plot_output_train_test(model_handler, data, bins=100, log=True)
         if not os.path.exists(bdt_score_dir):
@@ -215,8 +217,8 @@ class ModelApplication:
 
         print('\n++++++++++++++++++++++++++++++++++++++++++++++++++')
 
-    def load_preselection_efficiency(self, cent_class, split):
-        efficiencies_path = "../Results/Efficiencies"
+    def load_preselection_efficiency(self, cent_class, split, training_dir=""):
+        efficiencies_path = "../Results/Efficiencies/" + training_dir
         filename_efficiencies = efficiencies_path + f'/preseleff_cent{cent_class[0]}{cent_class[1]}{split}.root'
 
         tfile = ROOT.TFile(filename_efficiencies)
@@ -226,12 +228,12 @@ class ModelApplication:
 
         return self.presel_histo
 
-    def load_ML_analysis(self, cent_class, pt_range, ct_range, split=''):
+    def load_ML_analysis(self, cent_class, pt_range, ct_range, split='', training_dir=""):
 
         info_string = f'_{cent_class[0]}{cent_class[1]}_{pt_range[0]}{pt_range[1]}_{ct_range[0]}{ct_range[1]}{split}'
 
-        handlers_path = "../Models/handlers"
-        efficiencies_path = "../Results/Efficiencies"
+        handlers_path = "../Models/handlers/" + training_dir
+        efficiencies_path = "../Results/Efficiencies/" + training_dir
 
         filename_handler = handlers_path + '/model_handler' + info_string + '.pkl'
         filename_efficiencies = efficiencies_path + '/Eff_Score' + info_string + '.npy'

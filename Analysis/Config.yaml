@@ -1,5 +1,3 @@
-FILE_PREFIX: "ct_analysis"
-
 CENTRALITY_CLASS:
   - [0, 90]
 CT_BINS: [2, 4, 6, 10, 14, 35]
@@ -8,14 +6,16 @@ PT_BINS: [2, 10]
 BKG_MODELS: ["expo", "pol1", "pol2"]
 BDT_EFFICIENCY: [0.10, 1., 0.01] # min, max ,step
 
+TRAINING_DIR: "ls_training"
+
 TRAINING_PATHS:
-  MC_PATH: ../Tables/pass1/SignalTableReweight.root
-  BKG_PATH: ../Tables/pass1/LikeSignTable_18r.root
+  MC_PATH: /data/fmazzasc/PbPb_3body/pass3/tables/SignalTable_20g7.root
+  BKG_PATH: /data/fmazzasc/PbPb_3body/pass3/tables/HypDataTable_ls.root
 
 LOAD_APPLIED_DATA: True
 APPLICATION_PATHS:
   DATA_PATH: ../Tables/pass1/DataTable_*
-  LS_PATH: ../Tables/pass1/LikeSignTable_*
+  LS_PATH: 
   LS_PION_PATH: 
   EM_PATH: 
 

@@ -25,7 +25,7 @@ np.random.seed(42)
 parser = argparse.ArgumentParser()
 parser.add_argument('config', help='Path to the YAML configuration file')
 parser.add_argument('-split', '--split', help='Run with matter and anti-matter splitted', action='store_true')
-parser.add_argument('-s', '--significance', help='Use the BDTefficiency selection from the significance scan', action='store_true')
+parser.add_argument('-s', '--significance', help='Use the BDT efficiency selection from the significance scan', action='store_true')
 args = parser.parse_args()
 
 with open(os.path.expandvars(args.config), 'r') as stream:
@@ -37,10 +37,11 @@ with open(os.path.expandvars(args.config), 'r') as stream:
 
 ###############################################################################
 # define some globals
-FILE_PREFIX = params['FILE_PREFIX']
 
 DATA_PATH = os.path.expandvars(params["APPLICATION_PATHS"]['DATA_PATH'])
 
+
+TRAINING_DIR = params["TRAINING_DIR"]
 SPLIT_LIST = ['_matter','_antimatter'] if args.split else ['']
 BKG_MODELS = params['BKG_MODELS'] if 'BKG_MODELS' in params else ['expo']
 
@@ -61,9 +62,9 @@ SYSTEMATICS_COUNTS = 100000
 
 ###############################################################################
 # input/output files
-results_dir = "../Results"
+results_dir = "../Results/" +  TRAINING_DIR
 tables_dir = "../Tables"
-efficiency_dir = "../Results/Efficiencies"
+efficiency_dir = "../Results/Efficiencies/" + TRAINING_DIR
 utils_dir = "../Utils"
 mcsigma_dir = utils_dir + '/FixedSigma'
 
@@ -74,21 +75,17 @@ file_name = tables_dir + f'/pass1/applied_df_ct_analysis_ls.parquet.gzip'
 ls_df = pd.read_parquet(file_name)
 
 # output file
-file_name = results_dir + f'/{FILE_PREFIX}_dist.root'
+file_name = results_dir + '/ct_analysis_results.root'
 output_file = ROOT.TFile(file_name, 'recreate')
 
 # preselection eff
-file_name = efficiency_dir + f'/preseleff_cent090.root'
+file_name = efficiency_dir + TRAINING_DIR + f'/preseleff_cent090.root'
 efficiency_file = ROOT.TFile(file_name, 'read')
 EFFICIENCY = efficiency_file.Get('PreselEff').ProjectionY()
 
-# absorption correction file
-# file_name = utils_dir + '/he3abs/recCtHe3.root'
-# abs_file = ROOT.TFile(file_name, 'read')
-# ABSORPTION = abs_file.Get('Reconstructed ct spectrum')
 
 # significance scan output
-file_name = results_dir + f'/Efficiencies/{FILE_PREFIX}_sigscan.npy'
+file_name = efficiency_dir + TRAINING_DIR + '/sigscan.npy'
 sigscan_dict = np.load(file_name, allow_pickle=True).item()
 ###############################################################################
 
@@ -174,7 +171,7 @@ def get_corrected_counts(bkg, ctbin, eff):
 
 def get_effscore_dict(ctbin):
     info_string = f'090_210_{ctbin[0]}{ctbin[1]}'
-    file_name = efficiency_dir + f'/Eff_Score_{info_string}.npy'
+    file_name = efficiency_dir + TRAINING_DIR + f'/Eff_Score_{info_string}.npy'
     return {round(e[0], 2): e[1] for e in np.load(file_name).T}
 
 def get_mcsigma_dict(ctbin):
