@@ -10,11 +10,12 @@ import xgboost as xgb
 from hipe4ml.model_handler import ModelHandler
 
 
-def apply_on_large_data(tree_path, cent_classes, pt_bins, ct_bins, training_columns, split=''):
+def apply_on_large_data(tree_path, cent_classes, pt_bins, ct_bins, training_columns, split='', training_dir=""):
 
-    handlers_path = '../Models/handlers'
-    efficiencies_path = '../Results/Efficiencies'
+    handlers_path = '../Models/handlers/' + training_dir
+    efficiencies_path = '../Results/Efficiencies/' + training_dir
 
+    print("Handlers at: ", handlers_path, "\n")
 
     executor = ThreadPoolExecutor(max_workers=64)
     iterator = uproot.iterate(tree_path, executor=executor, library="pd")

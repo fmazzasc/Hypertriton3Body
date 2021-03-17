@@ -324,7 +324,7 @@ def sigma_plot_makeup(histo, model, ptbin, split):
     canvas.Write()
 
 
-def dalitz_plot(x_data, y_data, eff, ct_bin, x_axis, y_axis, x_label='', y_label=''):
+def dalitz_plot(x_data, y_data, eff, ct_bin, x_axis, y_axis, x_label='', y_label='', training_dir=""):
     
     plot = (
         hist.Hist.new
@@ -342,7 +342,7 @@ def dalitz_plot(x_data, y_data, eff, ct_bin, x_axis, y_axis, x_label='', y_label
         side_lw=2,
         side_color="steelblue"
         )
-    path = f'../Figures/Dalitz/ct_{ct_bin[0]}_{ct_bin[1]}'
+    path = f'../Figures/{training_dir}/Dalitz/ct_{ct_bin[0]}_{ct_bin[1]}'
     if not os.path.exists(path):
         os.makedirs(path)
     
