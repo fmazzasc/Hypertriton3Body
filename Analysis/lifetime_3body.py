@@ -17,7 +17,7 @@ import yaml
 from scipy import stats
 import uproot
 import hyp_plot_utils as hpu
-
+import hyp_analysis_utils as hau
 
 np.random.seed(42)
 
@@ -35,7 +35,8 @@ with open(os.path.expandvars(args.config), 'r') as stream:
         print(exc)
 
 
-TRAINING_DIR = params["TRAINING_DIR"]
+# TRAINING_DIR = params["TRAINING_DIR"]
+TRAINING_DIR = "ls_training_not_opt"
 SPLIT_LIST = ['_matter','_antimatter'] if args.split else ['']
 BKG_MODELS = params['BKG_MODELS'] if 'BKG_MODELS' in params else ['expo']
 CENT_CLASS = params['CENTRALITY_CLASS'][0]
@@ -67,7 +68,7 @@ data_df = pd.read_parquet(data_path)
 ls_df = pd.read_parquet(ls_path)
 
 # output file
-file_name = results_dir + '/ct_analysis_results.root'
+file_name = results_dir + '/ct_analysis_results_0.5_gaus.root'
 output_file = ROOT.TFile(file_name, 'recreate')
 
 # preselection eff
@@ -129,6 +130,7 @@ def fill_corrected_best(ctbin, counts, counts_err, eff):
     abs_corr=1
     presel_eff = get_presel_eff(ctbin)
     bin_width = CORRECTED_COUNTS_BEST.GetBinWidth(bin_idx)
+    print(counts, eff, presel_eff, bin_width)
     CORRECTED_COUNTS_BEST.SetBinContent(bin_idx, counts/eff/presel_eff/abs_corr/bin_width)
     CORRECTED_COUNTS_BEST.SetBinError(bin_idx, counts_err/eff/presel_eff/abs_corr/bin_width)
 
@@ -152,6 +154,14 @@ def get_corrected_counts(ctbin, eff):
     
     return counts, error
 
+def normalize_ls(data_counts, ls_counts, bins):
+    bin_centers = 0.5 * (bins[1:] + bins[:-1])
+    side_region = np.logical_or(bin_centers<2.992-2*0.0025, bin_centers>2.992+2*0.0025)
+    
+    side_data_counts = np.sum(data_counts[side_region])
+    side_ls_counts = np.sum(ls_counts[side_region])
+    scaling_factor = side_data_counts/side_ls_counts
+    return scaling_factor
 
 def get_effscore_dict(ctbin):
     info_string = f'090_210_{ctbin[0]}{ctbin[1]}'
@@ -208,7 +218,7 @@ for split in SPLIT_LIST:
                
             # get the data slice as a RooDataSet
             tsd = score_dict[eff]
-            n_bins = 38
+            n_bins = 45
             mass_range = [2.96, 3.04]
     
             data_selected = data_slice_ct.query('score>@tsd')
@@ -221,9 +231,12 @@ for split in SPLIT_LIST:
 
             selected_data_counts, bins = np.histogram(data_selected['m'], bins=n_bins, range=mass_range)
             selected_ls_counts,_ = np.histogram(ls_selected['m'], bins=n_bins, range=mass_range)
+            selected_ls_counts = selected_ls_counts*normalize_ls(selected_data_counts, selected_ls_counts, bins)
 
             selected_data_hist = h1_invmass(selected_data_counts, mass_range=mass_range, bins=n_bins, name=f'eff_{eff}_data')
             selected_ls_hist = h1_invmass(selected_ls_counts, mass_range=mass_range, bins=n_bins, name=f'eff_{eff}_ls')
+            subtr_hist = h1_invmass(selected_data_counts - selected_ls_counts, mass_range=mass_range, bins=n_bins, name=f'eff_{eff}_ls')
+            
 
             ##superimposed histos
             cv_sup = ROOT.TCanvas(f"sig_and_bkg_{eff}")
@@ -237,8 +250,10 @@ for split in SPLIT_LIST:
 
 
             # define signal parameters
-            # raw_counts = comb_fit_gaus(selected_ls_hist, selected_data_hist, f"comb_fit_{eff}_gaus", mass_range[0], mass_range[1], mcsigma)
-            raw_counts = comb_fit_erf(selected_ls_hist, selected_data_hist, f"comb_fit_{eff}_erf", mass_range[0], mass_range[1], mcsigma)
+            raw_counts = hau.fit_hist(subtr_hist, [0,90], [2,10], ctbin, nsigma=3, model="pol0", fixsigma=-1, sigma_limits=None, mode=3, split='')
+            raw_counts = raw_counts[0]
+            print(raw_counts)
+            # raw_counts = comb_fit_erf(selected_ls_hist, selected_data_hist, f"comb_fit_{eff}_erf", mass_range[0], mass_range[1], mcsigma)
 
 
 

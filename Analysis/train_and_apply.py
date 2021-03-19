@@ -116,8 +116,11 @@ if TRAIN:
 
                     y_pred = model_handler.predict(data[2])
                     data[2].insert(0, 'score', y_pred)
+                    y_pred_train = model_handler.predict(data[0])
                     eff, tsd = analysis_utils.bdt_efficiency_array(data[3], y_pred, n_points=1000)
                     score_from_eff_array = analysis_utils.score_from_efficiency_array(data[3], y_pred, FIX_EFF_ARRAY)
+                    print("after", score_from_eff_array)
+                    print("EFF: ", np.sum(data[1][y_pred_train>5.38212738])/np.sum(data[1]))
                     fixed_eff_array = np.vstack((FIX_EFF_ARRAY, score_from_eff_array))
 
                     if SIGMA_MC:

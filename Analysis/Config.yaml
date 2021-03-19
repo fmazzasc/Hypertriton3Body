@@ -6,7 +6,7 @@ PT_BINS: [2, 10]
 BKG_MODELS: ["expo", "pol1", "pol2"]
 BDT_EFFICIENCY: [0.10, 1., 0.01] # min, max ,step
 
-TRAINING_DIR: "ls_training"
+TRAINING_DIR: "ls_training_opt"
 
 TRAINING_PATHS:
   MC_PATH: /data/fmazzasc/PbPb_3body/pass3/tables/SignalTable_20g7.root
@@ -16,8 +16,8 @@ LOAD_APPLIED_DATA: False
 APPLICATION_PATHS:
   DATA_PATH: /data/fmazzasc/PbPb_3body/pass3/tables/HypDataTable_data.root
   LS_PATH: /data/fmazzasc/PbPb_3body/pass3/tables/HypDataTable_ls.root
-  LS_PION_PATH: /data/fmazzasc/PbPb_3body/pass3/tables/HypDataTable_ls_pion.root
-  EM_PATH: /data/fmazzasc/PbPb_3body/pass3/tables/HypDataTable_em.root
+  LS_PION_PATH: 
+  EM_PATH: 
 
 ANALYSIS_RESULTS_PATH: /data/fmazzasc/PbPb_3body/pass3/analysis_results/AnalysisResults_data.root
 
@@ -58,9 +58,9 @@ HYPERPARAMS_RANGE: #TODO: check if it works without tuples
 TRAINING_COLUMNS:
 - pt
 - cos_pa
-- dca_de
-- dca_pr
-- dca_pi
+# - dca_de
+# - dca_pr
+# - dca_pi
 - tpc_ncls_de
 - tpc_ncls_pr
 - tpc_ncls_pi
@@ -77,5 +77,5 @@ TRAINING_COLUMNS:
 - dca_pr_sv
 - dca_pi_sv
 - chi2
-- cos_theta_ppi_H
+# - cos_theta_ppi_H
 

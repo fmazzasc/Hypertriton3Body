@@ -3,7 +3,9 @@ import hipe4ml.analysis_utils as au
 from hipe4ml.tree_handler import TreeHandler
 import matplotlib.pyplot as plt
 import matplotlib.backends.backend_pdf
-pdf = matplotlib.backends.backend_pdf.PdfPages("distributions.pdf")
+
+results_dir = "../../Results/"
+pdf = matplotlib.backends.backend_pdf.PdfPages(results_dir + "distributions.pdf")
 
 def rename_df_columns(hndl):
     df = hndl.get_data_frame()
