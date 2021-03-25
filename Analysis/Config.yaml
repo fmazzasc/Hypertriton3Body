@@ -23,7 +23,7 @@ ANALYSIS_RESULTS_PATH: /data/fmazzasc/PbPb_3body/pass3/analysis_results/Analysis
 
 XGBOOST_PARAMS:
   # general parameters
-  n_jobs: 40 # number of available threads
+  n_jobs: 20 # number of available threads
   # learning task parameters
   objective: binary:logistic
   random_state: 42
