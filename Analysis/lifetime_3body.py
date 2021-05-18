@@ -25,6 +25,7 @@ np.random.seed(42)
 parser = argparse.ArgumentParser()
 parser.add_argument('config', help='Path to the YAML configuration file')
 parser.add_argument('-syst', '--syst', help='Compute systematic uncertainties', action='store_true')
+parser.add_argument('-fixed', '--eff_fixed', help='Compute systematic uncertainties', action='store_true')
 parser.add_argument('-s', '--significance', help='Use the BDT efficiency selection from the significance scan', action='store_true')
 args = parser.parse_args()
 
@@ -35,6 +36,7 @@ with open(os.path.expandvars(args.config), 'r') as stream:
         print(exc)
 
 SYSTEMATICS = args.syst
+FIXED_EFF_SYSTEMATICS = args.eff_fixed
 SIGNIFICANCE_SCAN = args.significance
 
 # TRAINING_DIR = params["TRAINING_DIR"]
@@ -45,7 +47,7 @@ CT_BINS = params['CT_BINS']
 EFF_MIN, EFF_MAX, EFF_STEP = params['BDT_EFFICIENCY']
 EFF_ARRAY = np.around(np.arange(EFF_MIN, EFF_MAX, EFF_STEP), 2)
 FIX_EFF = 0.6 if not SIGNIFICANCE_SCAN else 0
-SYSTEMATICS_COUNTS = 100000
+SYSTEMATICS_COUNTS = 10000
 
 ###############################################################################
 
@@ -217,8 +219,8 @@ for ctbin in zip(CT_BINS[:-1], CT_BINS[1:]):
             
         # get the data slice as a RooDataSet
         tsd = score_dict[eff]
-        n_bins = 45
-        mass_range = [2.96, 3.04]
+        n_bins = 50
+        mass_range = [2.97, 3.02]
 
         data_selected = data_slice_ct.query('score>@tsd')
         ls_selected = ls_slice_ct.query('score>@tsd')
@@ -319,9 +321,14 @@ if SYSTEMATICS:
 
     tmp_ctdist = CORRECTED_COUNTS_BEST.Clone('tmp_ctdist')
 
-    combinations = set()
+    combinations = [] if FIXED_EFF_SYSTEMATICS else set()
     sample_counts = 0   # good fits
     iterations = 0  # total fits
+
+    count_low = 0
+    count_up = 0
+    eff_low = []
+    eff_up = []
 
     # stop with SYSTEMATICS_COUNTS number of good B_{Lambda} fits
     while sample_counts < SYSTEMATICS_COUNTS:
@@ -334,22 +341,34 @@ if SYSTEMATICS:
         eff_idx_list = []
 
         # loop over ctbins
-        for ctbin_idx in range(len(CT_BINS)-1):
-            # random bkg model
-            # random BDT efficiency in the defined range
-            eff = np.random.choice(syst_eff_ranges[ctbin_idx])
-            eff_list.append(eff)
-            eff_idx = get_eff_index(eff)
-            eff_idx_list.append(eff_idx)
+        if FIXED_EFF_SYSTEMATICS:
+            eff_list = np.random.choice(syst_eff_ranges[1])*np.ones(len(CT_BINS)-1)
+            combo = eff_list[0]
+            print("COMBO: ",  combo)
 
-        # convert indexes into hash and if already sampled skip this combination
-        combo = ''.join(map(str, eff_idx_list))
+
+        else:
+            for ctbin_idx in range(len(CT_BINS)-1):
+                # random bkg model
+                # random BDT efficiency in the defined range
+                eff = np.random.choice(syst_eff_ranges[ctbin_idx])
+                eff_list.append(eff)
+                eff_idx = get_eff_index(eff)
+                eff_idx_list.append(eff_idx)
+            # convert indexes into hash and if already sampled skip this combination
+            combo = ''.join(map(str, eff_idx_list))
+        
+        if sample_counts==len(syst_eff_ranges[1]):
+            if FIXED_EFF_SYSTEMATICS:
+                break
+        
         if combo in combinations:
             continue
 
         # if indexes are good measure lifetime
         ctbin_idx = 1
         ct_bins = list(zip(CT_BINS[:-1], CT_BINS[1:]))
+        print("EFF LIST: ", eff_list)
 
         for eff in eff_list:
             ctbin = ct_bins[ctbin_idx-1]
@@ -360,23 +379,39 @@ if SYSTEMATICS:
             tmp_ctdist.SetBinError(ctbin_idx, error)
 
             ctbin_idx += 1
-
+    
         tmp_ctdist.Fit(expo, 'MEI0+', '', 2, 14)
 
-        # # if ct fit is good use it for systematics
+        if expo.GetParameter(1)>350 and count_up<5:
+            tmp_ctdist.SetName(f"lifetime_up_{count_up}")
+            tmp_ctdist.Write()
+            count_up += 1
+            eff_up.append(eff_list)
+
+        if expo.GetParameter(1)<270 and count_low<5:
+            tmp_ctdist.SetName(f"lifetime_low_{count_low}")
+            tmp_ctdist.Write()
+            count_low +=1
+            eff_low.append(eff_list)
+            
+
+        # if ct fit is good use it for systematics
         if expo.GetChisquare() > 2 * expo.GetNDF():
             continue
 
         lifetime_dist.Fill(expo.GetParameter(1))
         lifetime_prob.Fill(expo.GetProb())
 
-        combinations.add(combo)
+        combinations.append(combo) if FIXED_EFF_SYSTEMATICS else combinations.add(combo)
         sample_counts += 1
+        print("SAMPLE COUNTS:", sample_counts)
 
     output_file.cd()
 
     lifetime_dist.Write()
     lifetime_prob.Write()
+    print(f"Eff_up: ", eff_up)
+    print(f"Eff_low: ", eff_low)
 
 print('\n++++++++++++++++++++++++++++++++++++++++++++++++++')
 print(f'\nGood iterations / Total iterations -> {SYSTEMATICS_COUNTS/iterations:.4f}')

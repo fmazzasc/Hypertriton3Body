@@ -256,7 +256,7 @@ def fit_hist(
     # otherwise set sigma limits reasonably
     else:
         fit_tpl.SetParameter(n_bkgpars + 2, 0.002)
-        fit_tpl.SetParLimits(n_bkgpars + 2, 0.001, 0.003)
+        fit_tpl.SetParLimits(n_bkgpars + 2, 0.001, 0.002)
 
     ########################################
     # plotting the fits
