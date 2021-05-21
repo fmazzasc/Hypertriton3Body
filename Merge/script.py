@@ -11,7 +11,7 @@ print(lines)
 for ind,line in enumerate(lines):
     print(ind)
     input_files = line + "/" + tree_name
-    os.system(f' alien_cp -T 32 {input_files} /data/fmazzasc/PbPb_3body/pass3/trees//part_merging/{tree_name}{ind}')
+    os.system(f' alien_cp -T 32 {input_files} /data/fmazzasc/PbPb_3body/pass3/trees/part_merging/{tree_name}{ind}')
 
-os.system(f"alihadd {output_name} part_merging/{tree_name}*")
-os.system(f"rm -rf part_merging/*")
+# os.system(f"alihadd {output_name} part_merging/{tree_name}*")
+# os.system(f"rm -rf part_merging/*")

@@ -17,7 +17,7 @@ from hipe4ml.model_handler import ModelHandler
 
 # avoid pandas warning
 warnings.simplefilter(action='ignore', category=FutureWarning)
-# ROOT.gROOT.SetBatch()
+ROOT.gROOT.SetBatch()
 
 ###############################################################################
 parser = argparse.ArgumentParser()

@@ -121,7 +121,7 @@ class TrainingAnalysis:
             histo_minv = hau.h1_invmass(counts, cent_class, pt_range, ct_range)
 
             histo_minv.Fit('gaus', 'Q')
-
+            print("ciao")
             mean = histo_minv.GetFunction('gaus').GetParameter(1)
             mean_error = histo_minv.GetFunction('gaus').GetParError(1)
             sigma = histo_minv.GetFunction('gaus').GetParameter(2)
